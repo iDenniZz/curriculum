@@ -102,12 +102,72 @@ pf: Adding and deleting rules
 
 Public Key Cryptography
 =======================
+   
+A public key infrastructure (PKI) supports the distribution and identification
+of public encryption keys, enabling users and computers to both securely exchange
+data over networks suck as the internet and verify the identity of the other party.
+Without PKI, sensitive information can still be encrypted and exchanged, but there
+would be no assurance of the identity of the other party. Any form of sensitive
+data exchanged over the internet is reliant on PKI for security.
 
-.. todo::
-   What is PKI? What uses it? Why is it important?
+A typical PKI consists of hardware, software, policies and standards to manage the
+creation, administration, distribution and revocation of keys and digital 
+certificates. Digital certificates are most important parts of PKI as they affirm
+the identity of the certificate subject and bind that identity to the public 
+key contained in the certificate.
+
+PKI includes the following key elements: 
+
+- A trusted party, called a certificate authority (CA), acts as the root of trust
+  and provides services that authenticate the identity of individuals, computers 
+  and other entities  
+- A registration authority, often called a subordinate CA, certified by a root CA
+  to issue certificates for specific uses permitted by the root  
+- A certificate database, which stores certificate requests and issues and revokes
+  certificates 
+- A certificate store, which resides on a local computer as a place to store 
+  issued certificates and private keys  
 
 Using public and private keys for SSH authentication
 ----------------------------------------------------
+
+PKI can be used when you want to send a secure email to another person. I will 
+use an example in which Bob wants to send an email to Alice. This can be 
+accomplished in the following manner:
+
+1. Both Bob and Alice have their own key pairs. They have kept their private 
+  keys securely to themselves and have sent their public keys directly to 
+  each other.
+2. Bob uses Alice's public key to encrypt the message and sends it to her.
+3. Alice uses her private key to decrypt the message.
+
+This simplified example highlights at least one obvious concern Bob must have 
+about the public key he used to encrypt the message. That is, he cannot know 
+with certainty that the key he used for encryption actually belonged to Alice.
+It is possbile that another party monitoring the communication channel between
+Bob and Alice substituted a different key.
+
+The public key infrastructure concept has evolved to help address this problem 
+and others. When a CA is used, the preceding example can be modified in the 
+following manner:
+
+
+1. Assume that the CA has issued a signed digital certificate that contains its 
+   public key. The CA self-signs this certificate by using the private key 
+   that corresponds to the public key in the certificate.
+2. Alice and Bob agree to use the CA to verify their identities.
+3. Alice requests a public key certificate from the CA.
+4. The CA verifies her identity, computes a hash of the content that will make 
+   up her certificate, signs the hash by using the private key that corresponds 
+   to the public key in the published CA certificate, creates a new certificate
+   by concatenating the certificate content and the signed hash, and makes the 
+   new certificate publicly available.
+5. Bob retrieves the certificate, decrypts the signed hash by using the public 
+   key of the CA, computes a new hash of the certificate content, and compares
+   the two hashes. If the hashes match, the signature is verified and Bob can 
+   assume that the public key in the certificate does indeed belong to Alice.
+6. Bob uses Alice's verified public key to encrypt a message to her.
+7. Alice uses her private key to decrypt the message from Bob.
 
 
 Two factor authentication
